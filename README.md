@@ -35,7 +35,7 @@ In this script i set them as `Offense ID` (Format: Text) and `Domain` (Format: L
 
 At the custom field `Domain` (List) you have to add the Domain Names as you put it to the `config.ini`.
 
-TIP: Go to the custom field `Offense ID` and add to the `Link Values to URL`  https://<qradar-host>/console/qradar/jsp/QRadar.jsp?appName=Sem&pageId=OffenseSummary&summaryId=%value% so when you click on the `Offense ID` to open the specific Offense in the QRadar
+TIP: Go to the custom field `Offense ID` and add to the `Link Values to URL`  https://qradar-host/console/qradar/jsp/QRadar.jsp?appName=Sem&pageId=OffenseSummary&summaryId=%value% so when you click on the `Offense ID` to open the specific Offense in the QRadar
   
 
 You have to use the API of both QRadar and Redmine, to get some values that must be set before you begin, like the Redmine Project ID, the QRadar closing reason ID e.t.c.
