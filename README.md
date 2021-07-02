@@ -20,7 +20,7 @@ The idea behind this project is to use the Redmine as a Ticketing System, by tak
 # TODO
 
   - Create script to find these variables automatically  (run it the first time or when you make changes)
-  - Fetch more fields from QRadar
+  - Fetch more fields from QRadar (Date, Num of Events, Low Category e.t.c.)
   - Put API Endpoints to config file
   - Create one function for all API CALLS
   - Dockerize it
