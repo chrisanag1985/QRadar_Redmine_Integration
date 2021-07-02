@@ -27,9 +27,9 @@ You have to update the variables at the `config.ini` file, to get this Python sc
 You have to create at least two Custom Fields on Redmin Ticket of 'Ticketing System Project', which the script uses to correlate the QRadar Offense ID and Redmine Ticket ID.
 In this script i set them as `Offense ID` and `Domain`.
 
-You have to use the API of both QRadar and Redmine, to get some values that must set at start, like the Redmine Project ID, the QRadar closing reason ID e.t.c.
+You have to use the API of both QRadar and Redmine, to get some values that must be set before you begin, like the Redmine Project ID, the QRadar closing reason ID e.t.c.
 
-(Check the `config.ini` to see the requirements)
+(Check the `config.ini` to see these variables)
 
 It also creates a file (`open_offenses.txt`) that stores the last QRadar Offense ID and the last Redmine Ticket ID. (you can change the filename and filepath as you please.)
 
