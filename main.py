@@ -176,7 +176,7 @@ def get_qradar_offenses():
 def get_offenses_in_open_offense_list(filter):
 
 	headers =  {'SEC':qradar_api_key,'Accept': 'application/json'}
-	url = qradar_protocol+'://'+qradar_host+'api/siem/offenses?fields=id%2Cdomain_id%2Cdescription&filter=status%3D%22OPEN%22'
+	url = qradar_protocol+'://'+qradar_host+'/api/siem/offenses?fields=id%2Cdomain_id%2Cdescription&filter=status%3D%22OPEN%22'
 	r = requests.get(url,headers=headers,verify=False)
 	return(r.text)
 
