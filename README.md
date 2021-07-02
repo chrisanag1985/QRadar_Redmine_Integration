@@ -20,6 +20,7 @@ The idea behind this project is to use the Redmine as a Ticketing System, by tak
 # TODO
 
   - Create script to find these variables automatically  (run it the first time or when you make changes)
+  - Fetch more fields from QRadar
   - Put API Endpoints to config file
   - Create one function for all API CALLS
   - Dockerize it
@@ -30,7 +31,12 @@ The idea behind this project is to use the Redmine as a Ticketing System, by tak
 You have to update the variables at the `config.ini` file, to get this Python script to work. The `API-KEYS` must have sufficient rights to add,edit,update or remove Qradar Offenses and Redmine Tickets. (FYI: do not enter quotes in `config.ini`)
 
 You have to create at least two Custom Fields on Redmin Ticket of 'Ticketing System Project', which the script uses to correlate the QRadar Offense ID and Redmine Ticket ID.
-In this script i set them as `Offense ID` and `Domain`.
+In this script i set them as `Offense ID` (Format: Text) and `Domain` (Format: List) .
+
+At the custom field `Domain` (List) you have to add the Domain Names as you put it to the `config.ini`.
+
+TIP: Go to the custom field `Offense ID` and add to the `Link Values to URL`  https://<qradar-host>/console/qradar/jsp/QRadar.jsp?appName=Sem&pageId=OffenseSummary&summaryId=%value% so when you click on the `Offense ID` to open the specific Offense in the QRadar
+  
 
 You have to use the API of both QRadar and Redmine, to get some values that must be set before you begin, like the Redmine Project ID, the QRadar closing reason ID e.t.c.
 
