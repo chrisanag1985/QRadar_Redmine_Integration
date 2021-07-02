@@ -1,68 +1,50 @@
 import requests
 import json
+import configparser
 from requests.utils import requote_uri
 
 requests.packages.urllib3.disable_warnings()
 
 
-"""
-VARIABLES
-
-"""
-filename_to_store_vars = 'open_offenses.txt'
-
-"""
-
- QRADAR
-
-"""
-# Get the reason ID from qradar API you want to close the offense in QRadar
-# fqdn or IP
-qradar_api_key ='<QRADAR-API-KEY>'
-qradar_protocol = 'https'
-qradar_host = '<FQDN OR IP>'
-# Insert the reason ID you want to close the offense. You can get the ID from QRADAR API
-reason_id = 2
-
-#curl -S -X GET -u admin  -H 'Version: 15.0' -H 'Accept: application/json' 'https://qradar_host/api/config/domain_management/domains'
-
-qradar_domain_id = {
-	
-	0 : 'Domain1',
-	1:  'Domain2'
-
-}
-
-"""
-
-REDMINE
-
-"""
-redmine_api_key = '<REDMINE-API-KEY>'
-redmine_protocol = 'http'
-redmine_host = '<FQDN OR IP>'
-# Redmine Project ID you want to sync
-project_id = 1
-offense_custom_field = "Offense ID"
-offense_custom_field_id = 3
-domain_custom_field = "Domain"
-domain_custom_field_id =  4
-
-
-
-
-
-"""
-DO NOT EDIT BELOW THIS LINE
-
-"""
-#####################################################################################################################################
-
-
+qradar_domain_id = {}
 open_ticketid_dict = {}
 # {offense_id:ticket_id}
 maxt = 0
 maxq= 0
+
+
+config = configparser.ConfigParser()
+config.sections()
+config.read('config.ini') 
+
+filestore = config['FILESTORE']
+qradar = config['QRADAR']
+qradar_domains = config['QRADAR_DOMAINS']
+redmine = config['REDMINE']
+
+filename_to_store_vars = filestore['filename_to_store_vars']
+
+qradar_api_key = qradar['qradar_api_key']
+qradar_protocol = qradar['qradar_protocol']
+qradar_host = qradar['qradar_host']
+reason_id = int(qradar['reason_id'])
+
+for key in qradar_domains:
+	keyint = int(key)
+	qradar_domain_id[keyint] = qradar_domains[key]
+
+
+redmine_api_key = redmine['redmine_api_key']
+redmine_protocol = redmine['redmine_protocol']
+redmine_host = redmine['redmine_host']
+project_id = int(redmine['project_id'])
+offense_custom_field = redmine['offense_custom_field']
+offense_custom_field_id = int(redmine['offense_custom_field_id'])
+domain_custom_field = redmine['domain_custom_field']
+domain_custom_field_id = int(redmine['domain_custom_field_id'])
+
+
+
 
 
 # Get  max offense_id:ticket_id 
@@ -101,9 +83,6 @@ def initialize():
 def get_redmine_ticket_offense_ids(project_id):
 
 	total_tickets_count = 0
-	
-
-	#curl -X GET -H "X-Redmine-API-Key':'<api-key>"  http://redmine/issue_statuses.json
 
 	headers = {'X-Redmine-API-Key':redmine_api_key,'Accept':'application/json'}
 	
@@ -140,23 +119,6 @@ def get_redmine_ticket_offense_ids(project_id):
 
 	return(open_ticketid_dict)
 
-"""
-QRadar Offense
---------------
-
-curl -S -X GET -u admin -H 'Range: items=0-49' -H 'Version: 15.0' -H 'Accept: application/json' 'https://qradar_host/api/siem/offenses?filter=id%3E2'
-
-
-{'last_persisted_time': 1624958408000, 'username_count': 1, 'description': 'Access Permitted\n', 
-'rules': [{'id': 100439, 'type': 'CRE_RULE'}], 'event_count': 88, 'flow_count': 0, 'assigned_to': None, 'security_category_count': 1, 
-'follow_up': False, 'source_address_ids': [1], 'source_count': 1, 'inactive': True, 'protected': False, 'closing_user': None, 
-'destination_networks': ['Net-10-172-192.Net_192_168_0_0'], 'source_network': 'Net-10-172-192.Net_192_168_0_0', 'category_count': 1, 'close_time': None, 'remote_destination_count': 0, 
-'start_time': 1623392293060, 'magnitude': 4, 'last_updated_time': 1624956511662, 'credibility': 3, 'id': 1, 'categories': ['Access Permitted'], 'severity': 5, 'policy_category_count': 0, 
-'log_sources': [{'type_name': 'EventCRE', 'type_id': 18, 'name': 'Custom Rule Engine-8 :: qradar', 'id': 63}], 'closing_reason_id': None, 'device_count': 1, 
-'first_persisted_time': 1623392295000, 'offense_type': 0, 'relevance': 3, 'domain_id': 0, 'offense_source': '192.168.168.166', 'local_destination_address_ids': [1], 
-'local_destination_count': 1, 'status': 'OPEN'}
-"""
-
 
 def post_redmine_new_issue(description,domain,offense_id):
 	#returning ticket_id
@@ -185,7 +147,6 @@ def get_offenses_in_open_offense_list(filter):
 
 def close_ticket(ticket_id):
 
-	#curl -X GET -H "X-Redmine-API-Key':'api-key"  http://redmine/issue_statuses.json
 	print("Closing %d Ticket"%ticket_id)
 	headers = {'X-Redmine-API-Key':redmine_api_key,'Content-Type':'application/json','Accept':'application/json'}
 	payload = {'issue':{'status_id':4}}
@@ -220,7 +181,7 @@ def check_for_new_offenses():
 	#Get Qradar ID in Open status
 	x = get_offenses_in_open_offense_list(open_ticketid_dict.keys())
 	qradar_offenses_dict = json.loads(x)
-	# print(qradar_offenses_dict)
+	
 
 
 	
