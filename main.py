@@ -44,7 +44,10 @@ redmine_host = '<FQDN OR IP>'
 # Redmine Project ID you want to sync
 project_id = 1
 offense_custom_field = "Offense ID"
+offense_custom_field_id = 3
 domain_custom_field = "Domain"
+domain_custom_field_id =  4
+
 
 
 
@@ -159,7 +162,7 @@ def post_redmine_new_issue(description,domain,offense_id):
 	#returning ticket_id
 	
 	headers = {'X-Redmine-API-Key':redmine_api_key,'Content-Type':'application/json','Accept':'application/json'}
-	payload = {'issue':{'project_id':project_id,'subject':description,'custom_fields':[{'id':3,'name':offense_custom_field,'value':offense_id},{'id':4,'name':domain_custom_field,'value': domain}]}}
+	payload = {'issue':{'project_id':project_id,'subject':description,'custom_fields':[{'id':offense_custom_field_id,'name':offense_custom_field,'value':offense_id},{'id':domain_custom_field_id,'name':domain_custom_field,'value': domain}]}}
 	r = requests.post(redmine_protocol+'://'+redmine_host+'/issues.json',headers=headers,json=payload)
 	response = json.loads(r.text)
 
