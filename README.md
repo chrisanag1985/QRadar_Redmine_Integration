@@ -3,7 +3,7 @@
 The idea behind this project is to use the Redmine as a Ticketing System, by taking advantage of Issues Tracking feature.
 
 
-                                                BE AWARE, this is an EARLY DEV VERSION  
+                                BE AWARE, this is an EARLY DEV VERSION  
 
 # About this document
 
