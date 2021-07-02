@@ -22,14 +22,14 @@ The idea behind this project is to use the Redmine as a Ticketing System, by tak
 
 # Give it a try
 
-You have to update the variables at the beginning of the `main.py` file, to get this Python script to work. The `API-KEYS` must have sufficient rights to add,edit,update or remove Qradar Offenses and Redmine Tickets.
+You have to update the variables at the `config.ini` file, to get this Python script to work. The `API-KEYS` must have sufficient rights to add,edit,update or remove Qradar Offenses and Redmine Tickets. (FYI: do not enter quotes in `config.ini`)
 
-You have to create at least two Custom Fields on Redmin Ticket of the specific Project, which the script uses to correlate the QRadar Offense ID and Redmine Ticket ID.
+You have to create at least two Custom Fields on Redmin Ticket of 'Ticketing System Project', which the script uses to correlate the QRadar Offense ID and Redmine Ticket ID.
 In this script i set them as `Offense ID` and `Domain`.
 
 You have to use the API of both QRadar and Redmine, to get some values that must set at start, like the Redmine Project ID, the QRadar closing reason ID e.t.c.
 
-(Check the `main.py` to see the requirements)
+(Check the `config.ini` to see the requirements)
 
 It also creates a file (`open_offenses.txt`) that stores the last QRadar Offense ID and the last Redmine Ticket ID. (you can change the filename and filepath as you please.)
 
