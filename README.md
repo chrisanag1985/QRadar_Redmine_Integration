@@ -12,12 +12,17 @@ The idea behind this project is to use the Redmine as a Ticketing System, by tak
 
 # How it works
   
-  It works with `API CALLS` on both QRadar and Redmine Apps, so this script can run on a different server. 
-  It checks for new created QRadar Offenses and sync them to Redmine.
-  It checks if an Offense has been deleted from Qradar and removes it from Redmine.
-  It checks if a Ticket is Closed (Redmine Issue Status that is marked as closed Issue) and close it on QRadar.
+  - It works with `API CALLS` on both QRadar and Redmine Apps, so this script can run on a different server. 
+  - It checks for new created QRadar Offenses and sync them to Redmine.
+  - It checks if an Offense has been deleted from Qradar and removes it from Redmine.
+  - It checks if a Ticket is Closed (Redmine Issue Status that is marked as closed Issue) and close it on QRadar.
   
-  
+# TODO
+
+  - Create script to find these variables automatically  (run it the first time or when you make changes)
+  - Put API Endpoints to config file
+  - Create one function for all API CALLS
+  - Dockerize it
 
 
 # Give it a try
@@ -34,5 +39,7 @@ You have to use the API of both QRadar and Redmine, to get some values that must
 It also creates a file (`open_offenses.txt`) that stores the last QRadar Offense ID and the last Redmine Ticket ID. (you can change the filename and filepath as you please.)
 
 After you setup all these variables, add it  on a `crontab` or on `systemd` with timer and run it every `60s` or so. 
+
+
 
 
