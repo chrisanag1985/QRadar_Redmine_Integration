@@ -1,18 +1,13 @@
 import requests
 import json
 import configparser
-from requests.utils import requote_uri
-import sys
 import os
+import sys
 
 requests.packages.urllib3.disable_warnings()
 
-config_filename = 'config.ini.chris'
-qradar_domain_id = {}
-open_ticketid_dict = {}
-# {offense_id:ticket_id}
-maxt = 0
-maxq= 0
+config_filename = 'config.ini'
+
 
 
 if os.path.isfile(config_filename):
