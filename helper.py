@@ -6,7 +6,7 @@ import sys
 
 requests.packages.urllib3.disable_warnings()
 
-config_filename = 'config.ini'
+config_filename = 'config.ini.chris'
 
 
 
@@ -85,7 +85,10 @@ def get_redmine_custom_fields():
 	response = json.loads(r.text)
 	print("\nCustom Fields:")
 	for custom_field in response['custom_fields']:
-		print("ID: %s Name: %s"%(custom_field['id'],custom_field['name']))
+		print("ID: %s Name: %s Field Format: %s "%(custom_field['id'],custom_field['name'],custom_field['field_format']))
+		if custom_field['field_format'] == 'list':
+			for value in custom_field['possible_values']:
+				print(value)
 
 
 #https://qradar_host/api/config/domain_management/domains?fields=id%2Cdescription
