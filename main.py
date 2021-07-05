@@ -2,10 +2,12 @@ import requests
 import json
 import configparser
 from requests.utils import requote_uri
+import sys
+import os
 
 requests.packages.urllib3.disable_warnings()
 
-
+config_filename = 'config.ini'
 qradar_domain_id = {}
 open_ticketid_dict = {}
 # {offense_id:ticket_id}
@@ -13,35 +15,52 @@ maxt = 0
 maxq= 0
 
 
-config = configparser.ConfigParser()
-config.sections()
-config.read('config.ini') 
-
-filestore = config['FILESTORE']
-qradar = config['QRADAR']
-qradar_domains = config['QRADAR_DOMAINS']
-redmine = config['REDMINE']
-
-filename_to_store_vars = filestore['filename_to_store_vars']
-
-qradar_api_key = qradar['qradar_api_key']
-qradar_protocol = qradar['qradar_protocol']
-qradar_host = qradar['qradar_host']
-reason_id = int(qradar['reason_id'])
-
-for key in qradar_domains:
-	keyint = int(key)
-	qradar_domain_id[keyint] = qradar_domains[key]
+if os.path.isfile(config_filename):
+	config = configparser.ConfigParser()
+	config.sections()
+	config.read(config_filename) 
 
 
-redmine_api_key = redmine['redmine_api_key']
-redmine_protocol = redmine['redmine_protocol']
-redmine_host = redmine['redmine_host']
-project_id = int(redmine['project_id'])
-offense_custom_field = redmine['offense_custom_field']
-offense_custom_field_id = int(redmine['offense_custom_field_id'])
-domain_custom_field = redmine['domain_custom_field']
-domain_custom_field_id = int(redmine['domain_custom_field_id'])
+	filestore = config['FILESTORE']
+	qradar = config['QRADAR']
+	qradar_domains = config['QRADAR_DOMAINS']
+	redmine = config['REDMINE']
+
+	filename_to_store_vars = filestore['filename_to_store_vars']
+
+	qradar_api_key = qradar['qradar_api_key']
+	if qradar_api_key == "":
+		print("[+] Check your settings... QRadar API key is missing...")
+		sys.exit()
+	qradar_protocol = qradar['qradar_protocol']
+	qradar_host = qradar['qradar_host']
+	if qradar_host == "":
+		print("[+] Check your settings... QRadar Host value is missing...")
+	reason_id = int(qradar['reason_id'])
+
+	for key in qradar_domains:
+		keyint = int(key)
+		qradar_domain_id[keyint] = qradar_domains[key]
+
+
+	redmine_api_key = redmine['redmine_api_key']
+	if redmine_api_key == "":
+		print("[+] Check your settings... Script is terminating...")
+		sys.exit()
+	redmine_protocol = redmine['redmine_protocol']
+	redmine_host = redmine['redmine_host']
+	if redmine_host == "":
+		print("[+] Check your settings... Redmine Host value is missing...")
+	project_id = int(redmine['project_id'])
+	offense_custom_field = redmine['offense_custom_field']
+	offense_custom_field_id = int(redmine['offense_custom_field_id'])
+	domain_custom_field = redmine['domain_custom_field']
+	domain_custom_field_id = int(redmine['domain_custom_field_id'])
+
+else:
+
+	print("[+] The configuration file DOES NOT Exists!!!")
+	sys.exit()
 
 
 
@@ -77,7 +96,9 @@ def initialize():
 		file.write('0:0')
 		file.close()
 
-
+"""
+Redmine API Requests
+"""
 
 
 def get_redmine_ticket_offense_ids(project_id):
@@ -86,15 +107,14 @@ def get_redmine_ticket_offense_ids(project_id):
 
 	headers = {'X-Redmine-API-Key':redmine_api_key,'Accept':'application/json'}
 	
-	r = requests.get(redmine_protocol+'://'+redmine_host+'/issues.json?project_id='+str(project_id),headers=headers)
-
-
 	try:
+		r = requests.get(redmine_protocol+'://'+redmine_host+'/issues.json?project_id='+str(project_id),headers=headers)
 		response = json.loads(r.text)
 		total_tickets_count = response['total_count']
-	except:
-		print("[+] No Tickets Found")
-
+	except Exception as e:
+		# print("[+] No Tickets Found")
+		print("Error Found: "+e)
+		
 	
 	print("[+] Total Tickets Count:%s"%total_tickets_count)
 
@@ -102,18 +122,17 @@ def get_redmine_ticket_offense_ids(project_id):
 		for issue in response['issues']:
 			ticket_id = issue['id']
 
-			#print(issue['custom_fields'])
-
+			
 			for custom_field in issue['custom_fields']:
+				
 				if custom_field['name'] == offense_custom_field:
-					try:
-						val = int(custom_field['value'])
-						offense_id = custom_field['value']
-						#print(ticket_id,offense_id)
-						open_ticketid_dict[int(offense_id)] = int(ticket_id)
-					except:
-						
-						print("[+] Ticket %d : Not a QRadar related issue."%ticket_id)
+					if custom_field['value'] != "":
+							val = int(custom_field['value'])
+							offense_id = custom_field['value']
+							#print(ticket_id,offense_id)
+							open_ticketid_dict[int(offense_id)] = int(ticket_id)
+					else:
+							print("[+] Ticket %d : Not a QRadar related issue."%ticket_id)
 				
 
 
@@ -130,6 +149,17 @@ def post_redmine_new_issue(description,domain,offense_id):
 
 	return(response['issue']['id'])
 
+def close_ticket(ticket_id):
+
+	print("Closing %d Ticket"%ticket_id)
+	headers = {'X-Redmine-API-Key':redmine_api_key,'Content-Type':'application/json','Accept':'application/json'}
+	payload = {'issue':{'status_id':4}}
+	r = requests.put(redmine_protocol+'://'+redmine_host+'/issues/'+str(ticket_id)+'.json',headers=headers,json=payload)
+
+
+"""
+QRadar API Requests
+"""
 
 def get_qradar_offenses():
 
@@ -145,12 +175,7 @@ def get_offenses_in_open_offense_list(filter):
 	r = requests.get(url,headers=headers,verify=False)
 	return(r.text)
 
-def close_ticket(ticket_id):
 
-	print("Closing %d Ticket"%ticket_id)
-	headers = {'X-Redmine-API-Key':redmine_api_key,'Content-Type':'application/json','Accept':'application/json'}
-	payload = {'issue':{'status_id':4}}
-	r = requests.put(redmine_protocol+'://'+redmine_host+'/issues/'+str(ticket_id)+'.json',headers=headers,json=payload)
 
 
 def close_offense(offense_id,reason_id):
@@ -173,15 +198,18 @@ def check_for_new_offenses():
 	qradar_offenses_list = []
 	open_ticketid_dict = {}
 
-	# this dict takes offense_id:ticket_id from redmine
-	open_ticketid_dict = get_redmine_ticket_offense_ids(project_id)
-	# print(open_ticketid_dict,type(open_ticketid_dict))
+	try:
+		# this dict takes offense_id:ticket_id from redmine
+		open_ticketid_dict = get_redmine_ticket_offense_ids(project_id)
+		# print(open_ticketid_dict,type(open_ticketid_dict))
 
-	
-	#Get Qradar ID in Open status
-	x = get_offenses_in_open_offense_list(open_ticketid_dict.keys())
-	qradar_offenses_dict = json.loads(x)
-	
+		
+		#Get Qradar IDs in Open status
+		x = get_offenses_in_open_offense_list(open_ticketid_dict.keys())
+		qradar_offenses_dict = json.loads(x)
+	except Exception as e:
+		print(e)
+		sys.exit()		
 
 
 	
@@ -190,11 +218,11 @@ def check_for_new_offenses():
 		qradar_open[x['id']] = {'description':x['description'].replace('\n',''),'domain_id':x['domain_id']}
 
 
-	t = open_ticketid_dict.keys()
-	q = qradar_offenses_list
+	tickets = open_ticketid_dict.keys()
+	qids = qradar_offenses_list
 
 	#exists in redmine
-	d = t - q
+	d = tickets - qids
 	#must me in order
 	
 	for i in d:
@@ -203,7 +231,7 @@ def check_for_new_offenses():
 		close_ticket(open_ticketid_dict[i])
 
 	#exists in qradar
-	e = q - t
+	e = qids - tickets
 
 	#must be in order
 
