@@ -1,2 +1,4 @@
 *.chris
 *.txt
+.gitignore
+
