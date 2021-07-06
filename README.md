@@ -144,8 +144,4 @@ https://qradar_host/api/config/domain_management/domains?fields=id%2Cname
 
 It also creates a file (`open_offenses.txt`) that stores the last QRadar Offense ID and the last Redmine Ticket ID. (you can change the filename and filepath as you please.)
 
-After you setup all these variables, add it  on a `crontab` or on `systemd` with timer and run it every `60s` or so. 
-
-
-
-
+After you setup all these variables, add  `python3 main.py`  on a `crontab` or on `systemd with timer` and run it every `60s` or so. 
