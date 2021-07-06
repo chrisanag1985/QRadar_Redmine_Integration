@@ -79,7 +79,7 @@ if os.path.isfile(config_filename):
 					one_dict_to_rule_them_all[qradar_field]['attributes']['listValues'] = tmp
 
 	custom_field_offense = one_dict_to_rule_them_all['id']['map']
-	print(one_dict_to_rule_them_all)
+	# print(one_dict_to_rule_them_all)
 
 
 
@@ -158,22 +158,26 @@ def get_redmine_ticket_offense_ids(project_id):
 
 	if total_tickets_count > 0:
 		for issue in response['issues']:
+
 			ticket_id = issue['id']
+			
 
 			
 			for custom_field in issue['custom_fields']:
-				
-				if custom_field['id'] == custom_field_offense:
+
+			
+				if custom_field['name'] == custom_field_offense:
+					
 					if custom_field['value'] != "":
 							val = int(custom_field['value'])
 							offense_id = custom_field['value']
-							#print(ticket_id,offense_id)
+							# print(ticket_id,offense_id)
 							open_ticketid_dict[int(offense_id)] = int(ticket_id)
 					else:
 							print("[+] Ticket %d : Not a QRadar related issue."%ticket_id)
 				
 
-
+	# print(open_ticketid_dict)
 	return(open_ticketid_dict)
 
 
@@ -191,7 +195,7 @@ def do_payload(offense_reply_dict):
 		
 		if one_dict_to_rule_them_all[key]['attributes']['isCustom'] == 'True':
 			#custom field
-			print(key,one_dict_to_rule_them_all[key]['map'],offense_reply_dict[key])
+			#print(key,one_dict_to_rule_them_all[key]['map'],offense_reply_dict[key])
 			tmp_val = offense_reply_dict[key]
 			#check if is list and get the value
 			if one_dict_to_rule_them_all[key]['attributes']['isList'] == 'True':
@@ -220,7 +224,7 @@ def post_redmine_new_issue(offense_dict):
 
 	r = requests.post(redmine_protocol+'://'+redmine_host+'/issues.json',headers=headers,json=payload)
 	response = json.loads(r.text)
-	printer(r)
+	# printer(r)
 
 	return(response['issue']['id'])
 
@@ -275,7 +279,7 @@ def check_for_new_offenses():
 		qradar_offenses_dict = json.loads(x)
 	except Exception as e:
 		print("Exception: %s . Terminating..."%e)
-		sys.exit()		
+			
 
 
 	
@@ -289,6 +293,7 @@ def check_for_new_offenses():
 
 	#exists in redmine
 	d = tickets - qids
+
 	#must me in order
 	
 	for i in d:
@@ -298,6 +303,7 @@ def check_for_new_offenses():
 
 	#exists in qradar
 	e = qids - tickets
+
 
 	#must be in order
 
