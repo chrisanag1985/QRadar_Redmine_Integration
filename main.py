@@ -7,7 +7,7 @@ import os
 
 requests.packages.urllib3.disable_warnings()
 
-config_filename = 'config.ini.chris'
+config_filename = 'config.ini'
 qradar_domain_id = {}
 open_ticketid_dict = {}
 redmine_custom_fields_dict = {}
@@ -52,40 +52,13 @@ if os.path.isfile(config_filename):
 	if redmine_host == "":
 		print("[+] Check your settings... Redmine Host value is missing...")
 	project_id = int(redmine['project_id'])
-	
-
-	# offense_custom_field = redmine['offense_custom_field']
-	# offense_custom_field_id = int(redmine['offense_custom_field_id'])
-	# domain_custom_field = redmine['domain_custom_field']
-	# domain_custom_field_id = int(redmine['domain_custom_field_id'])
-
-	# for key in redmine_custom_fields:
-	# 	keyint = int(key)
-	# 	redmine_custom_fields_dict[keyint] = redmine_custom_fields[key]
-	# print(redmine_custom_fields_dict)
-
-	# for key in qradar_redmine_mapping:
-	# 	qradar_redmine_mapping_dict[key] = qradar_redmine_mapping[key]
-	# 	if key == 'id' :
-	# 		val = qradar_redmine_mapping_dict[key]
-	# 		custom_field_offense = [ k  for k,v in redmine_custom_fields_dict.items() if v == val]
-
-	# for key in custom_fields_is_list:
-	# 	custom_fields_is_list_dict[key] = custom_fields_is_list[key]
-	# 	print(custom_fields_is_list_dict)
-
-
-	# for key in qradar_domains:
-	# 	keyint = int(key)
-	# 	qradar_domain_id[keyint] = qradar_domains[key]
-
 
 	
 	redmine_custom_fields = config['REDMINE_CUSTOM_FIELDS']
 	qradar_redmine_mapping = config['QRADAR_REDMINE_MAPPING']
 	custom_fields_is_list = config['CUSTOM_FIELDS_IS_LIST']
 
-
+	# one_dict must all be strings
 	one_dict_to_rule_them_all = {}
 	for key in qradar_redmine_mapping:
 		qradar_field = key
@@ -217,16 +190,22 @@ def do_payload(offense_reply_dict):
 	for key in one_dict_to_rule_them_all.keys():
 		
 		if one_dict_to_rule_them_all[key]['attributes']['isCustom'] == 'True':
-			print("is custom")
-			#HERE
+			#custom field
+			print(key,one_dict_to_rule_them_all[key]['map'],offense_reply_dict[key])
+			tmp_val = offense_reply_dict[key]
+			#check if is list and get the value
+			if one_dict_to_rule_them_all[key]['attributes']['isList'] == 'True':
+				tmp_val = one_dict_to_rule_them_all[key]['attributes']['listValues'][str(offense_reply_dict[key])]
+
+			payload_dict['issue']['custom_fields'].append({'id': one_dict_to_rule_them_all[key]['attributes']['custom_id'] ,'name': one_dict_to_rule_them_all[key]['map'] ,'value': tmp_val  })
 		else:
-			print("not custom")
-			payload_dict['issue'][one_dict_to_rule_them_all[key]['map']] = offense_reply_dict[key] 
+			#not custom field
+			payload_dict['issue'][one_dict_to_rule_them_all[key]['map']] = offense_reply_dict[key].replace('\n','') 
 
 	
 
 	print(payload_dict)
-	sys.exit()
+	
 	
 	return(payload_dict)
 
@@ -237,11 +216,6 @@ def post_redmine_new_issue(offense_dict):
 	
 	
 	headers = {'X-Redmine-API-Key':redmine_api_key,'Content-Type':'application/json','Accept':'application/json'}
-	# payload = {'issue':{'project_id':project_id,'subject':description,'custom_fields':[
-
-	# {'id':offense_custom_field_id,'name':offense_custom_field,'value':offense_id},
-	# {'id':domain_custom_field_id,'name':domain_custom_field,'value': domain}
-	# ]}}
 	payload = do_payload(offense_dict)
 
 	r = requests.post(redmine_protocol+'://'+redmine_host+'/issues.json',headers=headers,json=payload)
@@ -261,17 +235,10 @@ def close_ticket(ticket_id):
 QRadar API Requests
 """
 
-# def get_qradar_offenses():
-
-# 	headers= {'SEC':qradar_api_key,'Accept': 'application/json'}
-# 	r = requests.get(qradar_protocol+'://'+qradar_host+'/api/siem/offenses',headers=headers,verify=False)
-# 	return(r.text)
-
 
 def get_offenses_in_open_offense_list(filter):
 
 	headers =  {'SEC':qradar_api_key,'Accept': 'application/json'}
-	#url = qradar_protocol+'://'+qradar_host+'/api/siem/offenses?fields=id%2Cdomain_id%2Cdescription&filter=status%3D%22OPEN%22'
 	url = qradar_protocol+'://'+qradar_host+'/api/siem/offenses?filter=status%3D%22OPEN%22'
 	r = requests.get(url,headers=headers,verify=False)
 	return(r.text)
@@ -302,9 +269,7 @@ def check_for_new_offenses():
 	try:
 		# this dict takes offense_id:ticket_id from redmine
 		open_ticketid_dict = get_redmine_ticket_offense_ids(project_id)
-		# print(open_ticketid_dict,type(open_ticketid_dict))
 
-		
 		#Get Qradar IDs in Open status
 		x = get_offenses_in_open_offense_list(open_ticketid_dict.keys())
 		qradar_offenses_dict = json.loads(x)
@@ -341,9 +306,6 @@ def check_for_new_offenses():
 		#is new?
 		if offense_id > maxq:
 			print("[+] New Offense. Sending to Redmine...")
-			# offense_id = i
-			# description = qradar_open[i]['description']
-			# domain = qradar_domain_id[qradar_open[i]['domain_id']]
 			ticket_id =  post_redmine_new_issue(qradar_open[offense_id])	
 			maxt = ticket_id
 			maxq = offense_id
