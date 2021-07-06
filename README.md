@@ -21,10 +21,25 @@ The idea behind this project is to use the Redmine as a Ticketing System, by tak
 
 You have to update the variables at the `config.ini` file, to get this Python script to work. The `API-KEYS` must have sufficient rights to add,edit,update or remove Qradar Offenses and Redmine Tickets. (FYI: do not enter quotes in `config.ini`)
 
+Variables in `config.ini`
+
+	API-KEY = askdflkal-adfsfsdf-sdffafasdf
+
+Get the project id from the `helper.py`
+
+	project_id = 1 
+
+This is the ID that the QRadar offenses will close on the QRadar. To get the `ID` go to QRADAR API : `/siem/offense_closing_reasons`
+
+	reason_id = 2
+
 
 
 You have to create at least two Custom Fields on Redmin Ticket of 'Ticketing System Project', which the script uses to correlate the QRadar Offense ID and Redmine Ticket ID.
 In this script i set them as `Offense ID` (Format: Text) and `Domain` (Format: List) .
+
+TIP: Go to the custom field `Offense ID` and add to the `Link Values to URL`  https://qradar-host/console/qradar/jsp/QRadar.jsp?appName=Sem&pageId=OffenseSummary&summaryId=%value% so when you click on the `Offense ID` to open the specific Offense in the QRadar
+
 
 At the custom field `Domain` (List) you have to add the Domain Names as you put it to the `config.ini`.
 
@@ -46,18 +61,7 @@ Possible values:
 
 ----------------------------------------------------------------------------------------------------------
 
-
-TIP: Go to the custom field `Offense ID` and add to the `Link Values to URL`  https://qradar-host/console/qradar/jsp/QRadar.jsp?appName=Sem&pageId=OffenseSummary&summaryId=%value% so when you click on the `Offense ID` to open the specific Offense in the QRadar
-
-
-  
-
-You have to use the API of both QRadar and Redmine, to get some values that must be set before you begin, like the Redmine Project ID, the QRadar closing reason ID e.t.c.
-
-To get the id and other info that will help you to edit the `config.ini` run the `helper.py`
-
-(Check the `config.ini` to see these variables)
-
+## Mapping QRadar Offenses with Redmine Ticketing System
 
 Example for `config.ini`
 
@@ -93,7 +97,7 @@ For more check: https://www.redmine.org/projects/redmine/wiki/Rest_Issues
 
 At the section `REDMINE_CUSTOM_FIELDS` you map the redmine `custom field id`  with the redmine `custom field name`. You can get this info by running the `helper.py`
 
-At the section `CUSTOM_FIELDS_IS_LIST` is for all the redmine custom fields that are format `List`. Now you have to map the redmine `custom field id` with the section that contains the possible values of the list. Maybe that sounds complicated so lets see this with an example.
+At the section `CUSTOM_FIELDS_IS_LIST` is for all the redmine custom fields that are format `List`. Now you have to map the redmine `custom field id` with the section that contains the possible values of the list. Maybe that sounds complicated, so lets see this with an example.
 
 
 
