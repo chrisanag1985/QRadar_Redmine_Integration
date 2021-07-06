@@ -41,7 +41,6 @@ Name: Domain
 Possible values: 
 	
 	Default Network
-
 	Domain1
 
 
@@ -63,32 +62,24 @@ To get the id and other info that will help you to edit the `config.ini` run the
 Example for `config.ini`
 
 
-[QRADAR_REDMINE_MAPPING]
-
-id = Offense ID
-
-domain_id = Domain
-
-description = subject
+	[QRADAR_REDMINE_MAPPING]
+	id = Offense ID
+	domain_id = Domain
+	description = subject
 
 
-[REDMINE_CUSTOM_FIELDS]
-
-3 = Offense ID
-
-4 = Domain
+	[REDMINE_CUSTOM_FIELDS]
+	3 = Offense ID
+	4 = Domain
 
 
-[CUSTOM_FIELDS_IS_LIST]
+	[CUSTOM_FIELDS_IS_LIST]
+	4 = QRADAR_DOMAINS
 
-4 = QRADAR_DOMAINS
 
-
-[QRADAR_DOMAINS]
-
-0 = Default Domain
-
-1 = Domain1
+	[QRADAR_DOMAINS]
+	0 = Default Domain
+	1 = Domain1
 
 
 Explanation:
@@ -111,11 +102,23 @@ Example:
 
 In this example we will map the `QRadar Domains` with the Redmine Custom Field `Domain` and we will use the above `config.ini` .
 
-Disclaimer: the QRadar returns in the offense the `{ domain_id : interger }`
+Disclaimer: the QRadar returns in the offense the `{ domain_id : integer }`
+
+
+If we run the `helper.py` is our example we get:
+
+
+	Custom Fields:
+	ID: 3 Name: Offense ID Field Format: string 
+	ID: 4 Name: Domain Field Format: list 
+	{'value': 'Domain1', 'label': 'Domain1'}
+	{'value': 'Default Network', 'label': 'Default Network'}
+
+
 
 As we see before in the above `config.ini` the custom field `Domain` has ID: 4 
 Now we add below the `CUSTOM_FIELDS_IS_LIST` the value ` 4 = QRADAR_DOMAINS` which map the custom id 4
-with a section in the `config.ini` with the name `QRADAR_DOMAINS`.
+with a section in the `config.ini` with the name `QRADAR_DOMAINS` (or what name you wish as long as it the same name with the section).
 
 Now we add a section `QRADAR_DOMAINS` in the `config.ini` and we add below this the values with the setup
 
@@ -129,8 +132,6 @@ https://qradar_host/api/config/domain_management/domains?fields=id%2Cname
 
 
 ----------------------------------------------------------------------------------------------------------
-
-
 
 
 
