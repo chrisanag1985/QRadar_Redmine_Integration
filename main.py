@@ -208,7 +208,7 @@ def do_payload(offense_reply_dict):
 
 	
 
-	print(payload_dict)
+	#print(payload_dict)
 	
 	
 	return(payload_dict)
