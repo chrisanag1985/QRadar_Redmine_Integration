@@ -40,22 +40,14 @@ To get the id and other info that will help you to edit the `config.ini` run the
 (Check the `config.ini` to see these variables)
 
 
-[QRADAR_DOMAINS]
-0 = Default Domain
-1 = Domain1
-
-
-[REDMINE_CUSTOM_FIELDS]
-3 = Offense ID
-4 = Domain
-
 [QRADAR_REDMINE_MAPPING]
+
 id = Offense ID
+
 domain_id = Domain
+
 description = subject
 
-[CUSTOM_FIELDS_IS_LIST]
-4 = QRADAR_DOMAINS
 
 Explanation:
 
