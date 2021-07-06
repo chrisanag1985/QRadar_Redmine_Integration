@@ -29,29 +29,24 @@ Get the project id from the `helper.py`
 
 	project_id = 1 
 
-This is the ID that the QRadar offenses will close on the QRadar. To get the `ID` go to QRADAR API : `/siem/offense_closing_reasons`
+This is the ID that the script will use to close the offenses at the QRadar. To get the `ID` go to QRADAR API : `/siem/offense_closing_reasons`
 
 	reason_id = 2
 
 
 
-You have to create at least two Custom Fields on Redmin Ticket of 'Ticketing System Project', which the script uses to correlate the QRadar Offense ID and Redmine Ticket ID.
-In this script i set them as `Offense ID` (Format: Text) and `Domain` (Format: List) .
+You have to create at least two Custom Fields for Issues, The first is used by the script to correlate the QRadar Offense ID and Redmine Ticket ID.
+In this script i set it by the name  `Offense ID` (Format: Text) and the second by the name  `Domain` (Format: List) which is used for mapping the QRadar Domain Management.
 
 TIP: Go to the custom field `Offense ID` and add to the `Link Values to URL`  https://qradar-host/console/qradar/jsp/QRadar.jsp?appName=Sem&pageId=OffenseSummary&summaryId=%value% so when you click on the `Offense ID` to open the specific Offense in the QRadar
 
+More specific about the Redmine custom field `Domain` (List).
 
-At the custom field `Domain` (List) you have to add the Domain Names as you put it to the `config.ini`.
+Navigate to: `Custom fields` -> `Issues` -> `Domain`
 
-----------------------------------------------------------------------------------------------------------
+Format: `List`
 
-Example For Custom Field `Domain`:
-
-Custom fields- > Issues -> Domain
-
-Format: List
-
-Name: Domain
+Name: `Domain`
 
 Possible values: 
 	
@@ -88,28 +83,34 @@ Example for `config.ini`
 
 Explanation:
 
-The sections `QRADAR_REDMINE_MAPPING`, `REDMINE_CUSTOM_FIELDS`, `CUSTOM_FIELDS_IS_LIST` are mandatory in the `config.ini`. 
+The sections `QRADAR_REDMINE_MAPPING`, `REDMINE_CUSTOM_FIELDS`, `CUSTOM_FIELDS_IS_LIST` are mandatory for the `config.ini`. 
 
-Moving on section `QRADAR_REDMINE_MAPPING`
-This helps the Redmine to map the QRADAR field with the Redmine field. In this example we map the `id` (QRadar) with the `Offense ID` (Redmine Custom Field)
-To get the QRadar fields see in the `Interactive API Documentation for Developers`, at the `/siem/offenses`. The Redmine Fields you can get it with `/issues.json`
-For more check: https://www.redmine.org/projects/redmine/wiki/Rest_Issues
 
-At the section `REDMINE_CUSTOM_FIELDS` you map the redmine `custom field id`  with the redmine `custom field name`. You can get this info by running the `helper.py`
 
-At the section `CUSTOM_FIELDS_IS_LIST` is for all the redmine custom fields that are format `List`. Now you have to map the redmine `custom field id` with the section that contains the possible values of the list. Maybe that sounds complicated, so lets see this with an example.
+- Section `QRADAR_REDMINE_MAPPING`
 
+This helps you to map the QRADAR fields with the Redmine fields. In this example we map the `id` (QRadar Offense ID) with the `Offense ID` (Redmine Custom Field)
+To see the QRadar possible fields that you can use, go to the  `Interactive API Documentation for Developers`, at the `/siem/offenses`. The Redmine's possible Fields you can get them from `/issues.json` or check: https://www.redmine.org/projects/redmine/wiki/Rest_Issues
+
+- Section `REDMINE_CUSTOM_FIELDS` ,
+
+For mapping the redmine `custom field id`  with the redmine `custom field name`. You can get more information by running the `helper.py`
+
+- Section `CUSTOM_FIELDS_IS_LIST` 
+
+For declaring the redmine custom fields that are `List` format and map them with a section in the `config.ini` which contains the possible values of the list.
 
 
 ----------------------------------------------------------------------------------------------------------
 Example:
 
-In this example we will map the `QRadar Domains` with the Redmine Custom Field `Domain` and we will use the above `config.ini` .
+In this example we will map the `QRadar Domains` with the Redmine Custom Field `Domain` and in our example we will use the above `config.ini` .
 
-Disclaimer: the QRadar returns in the offense the `{ domain_id : integer }`
+FYI: When you request from the QRadar API to get the offenses, the QRadar returns in the offense payload among the other the  `{ domain_id : integer }`
 
 
-If we run the `helper.py` is our example we get:
+
+Now at the Redmine API, if we run the `helper.py` (for our example) we get:
 
 
 	Custom Fields:
@@ -121,16 +122,18 @@ If we run the `helper.py` is our example we get:
 
 
 As we see before in the above `config.ini` the custom field `Domain` has ID: 4 
-Now we add below the `CUSTOM_FIELDS_IS_LIST` the value ` 4 = QRADAR_DOMAINS` which map the custom id 4
-with a section in the `config.ini` with the name `QRADAR_DOMAINS` (or what name you wish as long as it the same name with the section).
+Now  at the `config.ini` we add below the `CUSTOM_FIELDS_IS_LIST` the value ` 4 = QRADAR_DOMAINS` which map the custom id 4
+with a section in the `config.ini` with the name `QRADAR_DOMAINS` (this name is dynamic and you can put the name you wish as long as it is the same name with the section).
 
-Now we add a section `QRADAR_DOMAINS` in the `config.ini` and we add below this the values with the setup
+Now we add a section `QRADAR_DOMAINS` in the `config.ini` and we add below this section the values with the format
 
-QRadar domain_id = Redmine Custom Field List Value
+	QRadar domain_id = Redmine Custom Field List Value
 
-0  = Default Network
+e.g
 
-For QRadar i got these values by running at the API:
+	0  = Default Network
+
+For QRadar you can get these values from the API:
 
 https://qradar_host/api/config/domain_management/domains?fields=id%2Cname
 
