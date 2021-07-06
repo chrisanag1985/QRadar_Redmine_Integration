@@ -82,7 +82,7 @@ Example for `config.ini`
 
 
 	[QRADAR_DOMAINS]
-	0 = Default Domain
+	0 = Default Network
 	1 = Domain1
 
 
