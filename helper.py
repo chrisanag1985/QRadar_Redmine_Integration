@@ -6,7 +6,7 @@ import sys
 
 requests.packages.urllib3.disable_warnings()
 
-config_filename = 'config.ini.chris'
+config_filename = 'config.ini'
 
 
 
@@ -114,6 +114,7 @@ def get_qradar_closind_issues():
 	print("\nQRadar Closing Issues:")
 	for closing_issue in response:
 		print("ID: %d Name: %s"%(closing_issue['id'],closing_issue['text']))
+
 
 
 get_redmine_projects()
