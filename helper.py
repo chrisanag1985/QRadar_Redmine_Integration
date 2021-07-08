@@ -74,6 +74,20 @@ def get_redmine_issue_statuses():
 	for issue_status in response['issue_statuses']:
 		print("ID: %s  Name: %s   Close Issue: %s "%(issue_status['id'],issue_status['name'],issue_status['is_closed']))
 
+
+#GET /issue_statuses.json
+def get_redmine_trackers():
+
+
+	headers = {'X-Redmine-API-Key':redmine_api_key,'Accept':'application/json'}
+	
+	
+	r = requests.get(redmine_protocol+'://'+redmine_host+'/trackers.json',headers=headers)
+	response = json.loads(r.text)
+	print("\nTrackers:")
+	for tracker in response['trackers']:
+		print("ID: %s Name: %s"%(tracker['id'],tracker['name']))
+
 #GET /custom_fields.json
 def get_redmine_custom_fields():
 
@@ -118,6 +132,7 @@ def get_qradar_closind_issues():
 
 
 get_redmine_projects()
+get_redmine_trackers()
 get_redmine_issue_statuses()
 get_redmine_custom_fields()
 get_qradar_domains()
