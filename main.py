@@ -85,9 +85,8 @@ if os.path.isfile(config_filename):
 						one_dict_to_rule_them_all[qradar_field]['attributes']['map_qdomain_tracker'] =  tmp
 
 	custom_field_offense = one_dict_to_rule_them_all['id']['map']
-	print(one_dict_to_rule_them_all)
+	#print(one_dict_to_rule_them_all)
 
-	sys.exit()
 
 
 
