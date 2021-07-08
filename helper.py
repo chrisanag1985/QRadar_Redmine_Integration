@@ -75,7 +75,7 @@ def get_redmine_issue_statuses():
 		print("ID: %s  Name: %s   Close Issue: %s "%(issue_status['id'],issue_status['name'],issue_status['is_closed']))
 
 
-#GET /issue_statuses.json
+#GET /trackers.json
 def get_redmine_trackers():
 
 
