@@ -57,6 +57,7 @@ if os.path.isfile(config_filename):
 	redmine_custom_fields = config['REDMINE_CUSTOM_FIELDS']
 	qradar_redmine_mapping = config['QRADAR_REDMINE_MAPPING']
 	custom_fields_is_list = config['CUSTOM_FIELDS_IS_LIST']
+	map_qradar_domain_id_to_tracker = config['MAP_DOMAIN_TO_TRACKER']
 
 	# one_dict must all be strings
 	one_dict_to_rule_them_all = {}
@@ -77,10 +78,16 @@ if os.path.isfile(config_filename):
 					for k,v in custom_field_list_dict.items():
 						tmp[k] = v
 					one_dict_to_rule_them_all[qradar_field]['attributes']['listValues'] = tmp
+					tmp = {}
+					if qradar_field == 'domain_id':
+						for k,v in map_qradar_domain_id_to_tracker.items():
+							tmp[k] = v
+						one_dict_to_rule_them_all[qradar_field]['attributes']['map_qdomain_tracker'] =  tmp
 
 	custom_field_offense = one_dict_to_rule_them_all['id']['map']
-	# print(one_dict_to_rule_them_all)
+	print(one_dict_to_rule_them_all)
 
+	sys.exit()
 
 
 
